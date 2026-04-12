@@ -1,26 +1,117 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "../styles/tokens.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-pink: var(--color-pink);
+  --color-pink-light: var(--color-pink-light);
+  --color-lavender: var(--color-lavender);
+  --color-lavender-light: var(--color-lavender-light);
+  --color-mint: var(--color-mint);
+  --color-mint-light: var(--color-mint-light);
+  --color-blue: var(--color-blue);
+  --color-blue-light: var(--color-blue-light);
+  --color-yellow: var(--color-yellow);
+  --color-yellow-light: var(--color-yellow-light);
+  --color-peach: var(--color-peach);
+  --color-peach-light: var(--color-peach-light);
+  --color-cream: var(--color-cream);
+  --color-warm-white: var(--color-warm-white);
+  --color-outline: var(--color-outline);
+  --color-outline-soft: var(--color-outline-soft);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-sparkle: var(--color-sparkle);
+  --color-blush: var(--color-blush);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-text);
+}
+
+/* ---- Animations ---- */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes ripple {
+  0% { r: 10; opacity: 0.6; stroke-width: 2; }
+  100% { r: 60; opacity: 0; stroke-width: 0.5; }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-gentle-pulse {
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+/* Stagger delays for sparkles */
+.sparkle-delay-1 { animation-delay: 0s; }
+.sparkle-delay-2 { animation-delay: 0.5s; }
+.sparkle-delay-3 { animation-delay: 1s; }
+.sparkle-delay-4 { animation-delay: 1.5s; }
+
+@keyframes walk-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-walk-bob {
+  animation: walk-bob 0.4s ease-in-out infinite;
+}
+
+@keyframes drawer-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(195, 177, 216, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(195, 177, 216, 0.6); }
+}
+
+.animate-drawer-glow {
+  animation: drawer-glow 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-float,
+  .animate-sparkle,
+  .animate-shimmer,
+  .animate-gentle-pulse,
+  .animate-walk-bob,
+  .animate-drawer-glow {
+    animation: none;
+  }
 }
