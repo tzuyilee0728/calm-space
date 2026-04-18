@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { audioEngine } from '@/lib/audio/AudioEngine';
 
-const BURN_DURATION = 4500; // ms
+const BURN_DURATION = 10000; // ms — realistic paper burn speed
 
 interface EmberProps {
   x: number;       // 0-100 percentage across paper width
@@ -88,7 +88,7 @@ export default function BurnEffect({
       frequency: 600,
       Q: 1.5,
       gain: 0.12,
-      duration: 6,
+      duration: 12,
       fadeIn: 0.5,
     });
     // Higher crackle layer
@@ -97,7 +97,7 @@ export default function BurnEffect({
       frequency: 2200,
       Q: 2,
       gain: 0.06,
-      duration: 5,
+      duration: 11,
       fadeIn: 1,
     });
     return () => {
@@ -113,9 +113,10 @@ export default function BurnEffect({
       const elapsed = timestamp - startRef.current;
       // Non-linear: slow start (fire catching), accelerates
       const raw = Math.min(1, elapsed / BURN_DURATION);
-      const eased = raw < 0.2
-        ? raw * raw * 25       // slow quadratic start
-        : 0.2 * 0.2 * 25 + (raw - 0.2) * (1 - 0.2 * 0.2 * 25) / 0.8;  // linear rest
+      // Slow smoldering for first 35% of time (~3.5s), then accelerates
+      const eased = raw < 0.35
+        ? (raw / 0.35) * (raw / 0.35) * 0.15   // quadratic: reaches ~15% burn in first 3.5s
+        : 0.15 + ((raw - 0.35) / 0.65) * 0.85; // linear through remaining 85% of burn
       const p = Math.min(100, eased * 100);
       setProgress(p);
       progressRef.current = p;
