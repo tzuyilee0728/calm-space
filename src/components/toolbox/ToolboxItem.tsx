@@ -7,7 +7,6 @@ import type { StationDefinition } from '@/lib/stations/types';
 export default function ToolboxItem({ station }: { station: StationDefinition }) {
   const { dragState } = useStation();
   const isDragging = dragState?.stationId === station.id;
-  const RoomObject = station.RoomObject;
 
   const { onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useDragStation(station.id, 'toolbox');
 
@@ -25,19 +24,23 @@ export default function ToolboxItem({ station }: { station: StationDefinition })
         touchAction: 'none',
       }}
     >
-      {/* Station preview */}
-      <div className="flex justify-center overflow-hidden" style={{ height: 70 }}>
-        <div style={{ transform: 'scale(0.55)', transformOrigin: 'top center' }}>
-          <RoomObject isActive={false} onActivate={() => {}} />
-        </div>
+      <div className="flex justify-center items-center" style={{ height: 56 }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: station.accentColor,
+            border: '2px solid var(--color-outline-soft)',
+            boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.08)',
+          }}
+        />
       </div>
 
-      {/* Station name */}
       <p className="text-xs font-bold text-[var(--color-text)] text-center mt-1.5 truncate">
         {station.name}
       </p>
 
-      {/* Accent color dot */}
       <div
         className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-[var(--color-outline-soft)]"
         style={{ backgroundColor: station.accentColor }}

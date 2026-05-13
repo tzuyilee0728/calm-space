@@ -2,12 +2,20 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import { useStation } from '@/hooks/useStation';
+import { usePlayer } from '@/hooks/usePlayer';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { stations } from '@/components/stations/StationRegistry';
+import PlayerCharacter from '@/components/player/PlayerCharacter';
 import ToolboxToggle from './ToolboxToggle';
 import ToolboxItem from './ToolboxItem';
+import MobileToolbox from './MobileToolbox';
 
 export default function Toolbox() {
+  const isMobile = useIsMobile();
   const { toolboxOpen, positions } = useStation();
+  const { profile } = usePlayer();
+
+  if (isMobile) return <MobileToolbox />;
 
   const storedStations = stations.filter(s => positions[s.id] === null);
 
@@ -45,6 +53,27 @@ export default function Toolbox() {
             <p className="text-[11px] text-[var(--color-text-muted)] mt-1">
               Drag items onto the grass to place them
             </p>
+          </div>
+
+          {/* Player tile */}
+          <div className="px-4 pt-3">
+            <div
+              className="relative bg-[var(--color-cream)] border-2 border-[var(--color-outline-soft)] hover:border-[var(--color-pink)] transition-all duration-200"
+              style={{ borderRadius: 'var(--radius-lg)', padding: '12px' }}
+            >
+              <div className="flex justify-center items-center" style={{ height: 70 }}>
+                <div style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}>
+                  <PlayerCharacter />
+                </div>
+              </div>
+              <p className="text-xs font-bold text-[var(--color-text)] text-center mt-1.5 truncate">
+                {profile.name || 'Me'}
+              </p>
+              <div
+                className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-[var(--color-outline-soft)]"
+                style={{ backgroundColor: 'var(--color-peach-light)' }}
+              />
+            </div>
           </div>
 
           {/* Items */}

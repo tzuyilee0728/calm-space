@@ -1,7 +1,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { Suspense } from 'react';
 import { useStation } from '@/hooks/useStation';
 import { stations } from './StationRegistry';
 import BackButton from '@/components/ui/BackButton';
@@ -21,7 +20,6 @@ export default function StationOverlay() {
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[1000] flex items-center justify-center"
         >
-          {/* Fully opaque backdrop — hides room completely */}
           <div
             className="absolute inset-0"
             style={{
@@ -29,7 +27,6 @@ export default function StationOverlay() {
             }}
           />
 
-          {/* Scrollable content area */}
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 16 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -38,17 +35,9 @@ export default function StationOverlay() {
             className="relative z-10 w-full h-full overflow-auto"
           >
             <BackButton onClick={closeStation} />
-            <Suspense
-              fallback={
-                <div className="flex items-center justify-center h-full">
-                  <div className="w-12 h-12 rounded-full border-4 border-[var(--color-pink-light)] border-t-[var(--color-pink)] animate-spin" />
-                </div>
-              }
-            >
-              <div className="flex items-center justify-center min-h-full py-16">
-                <activeStation.Overlay />
-              </div>
-            </Suspense>
+            <div className="flex items-center justify-center min-h-full py-16">
+              <activeStation.Overlay />
+            </div>
           </motion.div>
         </motion.div>
       )}

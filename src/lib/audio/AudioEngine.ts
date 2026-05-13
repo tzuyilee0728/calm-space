@@ -163,10 +163,14 @@ class AudioEngine {
     type?: OscillatorType;
     gain?: number;
     fadeIn?: number;
+    /** Stereo pan: -1 = full left, 0 = center, 1 = full right. Required for true binaural beats. */
+    pan?: number;
+    /** If true, skip the reverb send (cleaner for binaural carriers). */
+    dry?: boolean;
   }): { stop: (fadeOut?: number) => void } {
     const ctx = this.getContext();
     const now = ctx.currentTime;
-    const { frequency, type = 'sine', gain = 0.15, fadeIn = 2 } = options;
+    const { frequency, type = 'sine', gain = 0.15, fadeIn = 2, pan = 0, dry = false } = options;
 
     const osc = ctx.createOscillator();
     osc.frequency.value = frequency;
@@ -177,8 +181,17 @@ class AudioEngine {
     envelope.gain.linearRampToValueAtTime(gain, now + fadeIn);
 
     osc.connect(envelope);
-    envelope.connect(this.masterGain!);
-    envelope.connect(this.reverbNode!);
+
+    if (pan !== 0) {
+      const panner = ctx.createStereoPanner();
+      panner.pan.value = Math.max(-1, Math.min(1, pan));
+      envelope.connect(panner);
+      panner.connect(this.masterGain!);
+      if (!dry) panner.connect(this.reverbNode!);
+    } else {
+      envelope.connect(this.masterGain!);
+      if (!dry) envelope.connect(this.reverbNode!);
+    }
     osc.start(now);
 
     return {

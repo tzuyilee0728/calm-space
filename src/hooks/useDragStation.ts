@@ -1,53 +1,34 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useStation, type DragState } from '@/hooks/useStation';
-import {
-  screenToGridSnapped,
-  isInBounds,
-  getOccupiedCells,
-} from '@/lib/isometric/constants';
-import { stations } from '@/components/stations/StationRegistry';
 
 export function useDragStation(stationId: string, source: 'grid' | 'toolbox') {
   const {
-    positions,
     moveStation,
     storeStation,
     openStation,
     setDragState,
+    dragState,
   } = useStation();
 
   const dragStartRef = useRef<{ x: number; y: number; moved: boolean } | null>(null);
-  const sceneRectRef = useRef<DOMRect | null>(null);
   const toolboxRectRef = useRef<DOMRect | null>(null);
-  const latestDragRef = useRef<DragState | null>(null);
+  // Mirror of the latest dragState for this station so onPointerUp can read
+  // the previewPosition that DragHandler3D publishes asynchronously.
+  const dragStateRef = useRef<DragState | null>(null);
 
-  const station = stations.find(s => s.id === stationId)!;
-  const { w, h } = station.gridSize;
-
-  const checkCollision = useCallback((col: number, row: number): boolean => {
-    const newCells = new Set(getOccupiedCells(col, row, w, h));
-    for (const s of stations) {
-      if (s.id === stationId) continue;
-      const pos = positions[s.id];
-      if (pos == null) continue;
-      const otherCells = getOccupiedCells(pos.col, pos.row, s.gridSize.w, s.gridSize.h);
-      for (const cell of otherCells) {
-        if (newCells.has(cell)) return true;
-      }
+  useEffect(() => {
+    if (dragState?.stationId === stationId) {
+      dragStateRef.current = dragState;
     }
-    return false;
-  }, [positions, stationId, w, h]);
+  }, [dragState, stationId]);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     dragStartRef.current = { x: e.clientX, y: e.clientY, moved: false };
-    const sceneEl = document.querySelector('[data-isometric-scene]');
-    sceneRectRef.current = sceneEl ? sceneEl.getBoundingClientRect() : null;
     const toolboxEl = document.querySelector('[data-toolbox-dropzone]');
     toolboxRectRef.current = toolboxEl ? toolboxEl.getBoundingClientRect() : null;
-    // Capture on currentTarget (the div with handlers) so events keep flowing
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }, []);
 
@@ -64,44 +45,38 @@ export function useDragStation(stationId: string, source: 'grid' | 'toolbox') {
     const clientX = e.clientX;
     const clientY = e.clientY;
 
-    // Check if over toolbox area (right edge of screen, ~80px strip)
     const tbRect = toolboxRectRef.current;
+    // The right-edge fallback covers the desktop "auto-snap-to-closed-drawer"
+    // UX. Skip it on mobile where the bottom sheet is always visible and the
+    // rect query is reliable — otherwise right-edge touches falsely trigger
+    // the drop zone.
+    const isCoarse = typeof window !== 'undefined'
+      && window.matchMedia('(pointer: coarse), (max-width: 768px)').matches;
     const overToolbox = source === 'grid' && (
       (tbRect && clientX >= tbRect.left && clientX <= tbRect.right && clientY >= tbRect.top && clientY <= tbRect.bottom)
-      || clientX >= window.innerWidth - 80
+      || (!isCoarse && clientX >= window.innerWidth - 80)
     );
 
-    // Check if over scene for grid snapping
-    let previewPosition = null;
-    const sceneRect = sceneRectRef.current;
-    if (sceneRect && !overToolbox) {
-      const sceneX = clientX - sceneRect.left;
-      const sceneY = clientY - sceneRect.top;
-      const snapped = screenToGridSnapped(sceneX, sceneY);
-      const inBounds = isInBounds(snapped.col, snapped.row, w, h);
-      const hasCollision = inBounds && checkCollision(snapped.col, snapped.row);
-      if (inBounds && !hasCollision) {
-        previewPosition = snapped;
-      }
-    }
-
-    const newState: DragState = {
-      stationId,
-      clientX,
-      clientY,
-      previewPosition,
-      source,
-      overToolbox: !!overToolbox,
-    };
-    latestDragRef.current = newState;
-    setDragState(newState);
-  }, [stationId, source, w, h, checkCollision, setDragState]);
+    setDragState(prev => {
+      // Preserve previewPosition from prior state (DragHandler3D publishes it);
+      // clear it while hovering the toolbox.
+      const previousPreview = prev?.stationId === stationId ? prev.previewPosition : null;
+      return {
+        stationId,
+        clientX,
+        clientY,
+        previewPosition: overToolbox ? null : previousPreview,
+        source,
+        overToolbox: !!overToolbox,
+      };
+    });
+  }, [stationId, source, setDragState]);
 
   const onPointerUp = useCallback(() => {
     const wasDragging = dragStartRef.current?.moved;
-    const drag = latestDragRef.current;
+    const drag = dragStateRef.current;
     dragStartRef.current = null;
-    latestDragRef.current = null;
+    dragStateRef.current = null;
 
     if (wasDragging && drag?.overToolbox) {
       storeStation(stationId);
@@ -119,7 +94,7 @@ export function useDragStation(stationId: string, source: 'grid' | 'toolbox') {
 
   const onPointerCancel = useCallback(() => {
     dragStartRef.current = null;
-    latestDragRef.current = null;
+    dragStateRef.current = null;
     setDragState(null);
   }, [setDragState]);
 

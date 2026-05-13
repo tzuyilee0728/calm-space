@@ -1,29 +1,33 @@
-import { lazy } from 'react';
 import type { StationDefinition } from '@/lib/stations/types';
-import RecordPlayerObject from './record-player/RecordPlayerObject';
-import SingingBowlObject from './singing-bowl/SingingBowlObject';
-import BubbleWrapObject from './bubble-wrap/BubbleWrapObject';
-import BreathingGuideObject from './breathing-guide/BreathingGuideObject';
-import LetItGoObject from './let-it-go/LetItGoObject';
+import RecordPlayer3D from '@/components/room3d/stations/RecordPlayer3D';
+import SingingBowl3D from '@/components/room3d/stations/SingingBowl3D';
+import BubbleWrap3D from '@/components/room3d/stations/BubbleWrap3D';
+import BreathingGuide3D from '@/components/room3d/stations/BreathingGuide3D';
+import LetItGo3D from '@/components/room3d/stations/LetItGo3D';
+import RecordPlayerOverlay from './record-player/RecordPlayerOverlay';
+import SingingBowlOverlay from './singing-bowl/SingingBowlOverlay';
+import BubbleWrapOverlay from './bubble-wrap/BubbleWrapOverlay';
+import BreathingGuideOverlay from './breathing-guide/BreathingGuideOverlay';
+import LetItGoOverlay from './let-it-go/LetItGoOverlay';
 
 export const stations: StationDefinition[] = [
   {
     id: 'record-player',
     name: 'Meditation Music',
     description: 'Ambient sounds for your mind',
-    RoomObject: RecordPlayerObject,
-    Overlay: lazy(() => import('./record-player/RecordPlayerOverlay')),
-    gridPosition: { col: 0, row: 0 },
-    gridSize: { w: 2, h: 2 },
+    Room3DObject: RecordPlayer3D,
+    Overlay: RecordPlayerOverlay,
+    gridPosition: { col: 3, row: 3 },
+    gridSize: { w: 4, h: 4 },
     accentColor: 'var(--color-peach)',
   },
   {
     id: 'singing-bowl',
     name: 'Singing Bowls',
     description: 'Tap the bowls to hear them sing',
-    RoomObject: SingingBowlObject,
-    Overlay: lazy(() => import('./singing-bowl/SingingBowlOverlay')),
-    gridPosition: { col: 3, row: 1 },
+    Room3DObject: SingingBowl3D,
+    Overlay: SingingBowlOverlay,
+    gridPosition: null,
     gridSize: { w: 2, h: 2 },
     accentColor: 'var(--color-lavender)',
   },
@@ -31,9 +35,9 @@ export const stations: StationDefinition[] = [
     id: 'bubble-wrap',
     name: 'Bubble Wrap',
     description: 'Pop away your stress',
-    RoomObject: BubbleWrapObject,
-    Overlay: lazy(() => import('./bubble-wrap/BubbleWrapOverlay')),
-    gridPosition: { col: 1, row: 3 },
+    Room3DObject: BubbleWrap3D,
+    Overlay: BubbleWrapOverlay,
+    gridPosition: null,
     gridSize: { w: 2, h: 2 },
     accentColor: 'var(--color-mint)',
   },
@@ -41,9 +45,9 @@ export const stations: StationDefinition[] = [
     id: 'breathing-guide',
     name: 'Breathing Guide',
     description: 'Follow the rhythm and just breathe',
-    RoomObject: BreathingGuideObject,
-    Overlay: lazy(() => import('./breathing-guide/BreathingGuideOverlay')),
-    gridPosition: { col: 5, row: 0 },
+    Room3DObject: BreathingGuide3D,
+    Overlay: BreathingGuideOverlay,
+    gridPosition: null,
     gridSize: { w: 2, h: 2 },
     accentColor: 'var(--color-blue)',
   },
@@ -51,9 +55,9 @@ export const stations: StationDefinition[] = [
     id: 'let-it-go',
     name: 'Let It Go',
     description: 'Name your fears and release them',
-    RoomObject: LetItGoObject,
-    Overlay: lazy(() => import('./let-it-go/LetItGoOverlay')),
-    gridPosition: { col: 3, row: 5 },
+    Room3DObject: LetItGo3D,
+    Overlay: LetItGoOverlay,
+    gridPosition: null,
     gridSize: { w: 2, h: 2 },
     accentColor: 'var(--color-peach)',
   },

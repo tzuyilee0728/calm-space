@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
 import type { GridPosition } from '@/lib/isometric/constants';
 
 export interface DragState {
@@ -20,7 +20,7 @@ interface StationState {
   moveStation: (id: string, pos: GridPosition) => void;
   storeStation: (id: string) => void;
   dragState: DragState | null;
-  setDragState: (state: DragState | null) => void;
+  setDragState: Dispatch<SetStateAction<DragState | null>>;
   toolboxOpen: boolean;
   setToolboxOpen: (open: boolean) => void;
 }

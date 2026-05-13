@@ -6,7 +6,7 @@ import FloatingLabel from '@/components/ui/FloatingLabel';
 import { usePlayer } from '@/hooks/usePlayer';
 
 export default function PlayerCharacter() {
-  const { facing, isWalking, profile, openProfile } = usePlayer();
+  const { profile, openProfile } = usePlayer();
   const [hovered, setHovered] = useState(false);
 
   const label = profile.name || 'Me';
@@ -30,14 +30,13 @@ export default function PlayerCharacter() {
         height="80"
         viewBox="0 0 60 80"
         fill="none"
-        className={isWalking ? 'animate-walk-bob' : ''}
         style={{
           filter: hovered
             ? 'drop-shadow(0 0 10px rgba(232, 180, 184, 0.5))'
             : 'drop-shadow(0 2px 4px rgba(122, 110, 110, 0.15))',
         }}
       >
-        <g transform={facing === 'left' ? 'translate(60, 0) scale(-1, 1)' : undefined}>
+        <g>
           {/* Hair */}
           <path
             d="M12 24 Q12 6 30 6 Q48 6 48 24"
